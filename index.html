@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+	<title>jQuery Web Form Handler</title>
+
+	<!-- Normalize and Reset -->
+	<link href="css/normalizeReset.css" rel="stylesheet">
+
+	<!-- Google Fonts -->
+	<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700,900" rel="stylesheet">
+
+	<!-- CSS styles for this presentation -->
+	<link href="css/presentation.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="mainContent">
+
+	<h1 class="textCenter">jQuery Web Form Handler</h1>
+	<p class="textCenter version addMarginBtm3">Version 1.0 by Alex Moschopoulos</p>
+
+	<h2>Introduction</h2>
+	<p>In today&rsquo;s modern website, having your simple forms function with a page refresh is outdated thinking, and a poor user experience. Many times we&rsquo;ve all seen older forms like those hang on the loading of a confirmation page, and while the site owner gets their data, the end user might think something went wrong.</p>
+	<p>Using technology such as JavaScript and PHP allows us to create a smoother experience for the end user. Try this form and you&rsquo;ll see:</p>
+	<div class="sampleForm">
+		<form role="form" method="post" name="form">
+			<input type="text" name="cForm01" id="cForm01" class="formInput01 formField">
+			<label for="cForm01" class="formLabel01 fieldLabel">Your name</label>
+			<input type="text" name="cForm02" id="cForm02" class="formInput02 formField">
+			<label for="cForm02" class="formLabel02 fieldLabel">Your email address</label>
+			<input type="text" name="cForm03" id="cForm03" class="formInput03 formField">
+			<label for="cForm03" class="formLabel03 fieldLabel">Email address to send a message to</label>
+			<textarea rows="6" name="cForm04" id="cForm04" class="formInput04 formArea"></textarea>
+			<label for="cForm04" class="formLabel04 fieldLabel">Your message</label>
+			<div class="submitDiv">
+				<button type="submit" class="submit">Submit</button>
+				<span class="error" style="display:none"> Please complete all fields.</span>
+				<span class="success" style="display:none"> Thank you for your submission.</span>
+				<span class="processing" style="display:none"> Processing....</span>
+			</div>
+		</form>
+	</div>
+	<p>Now while many new frameworks and content management systems offer form handling as a feature or module, this handly little script is great for those who like to at things without the overhead.</p>
+	<h2>Getting Set Up</h2>
+	<p>You will need jQuery for this particular script if you wish to use it. Eventually I&rsquo;ll update this script to go vanilla or utilize other setups.</p>
+	<p>Your first step is to set up a web form for you to use. I did include the JavaScript to give that &ldquo;material&rdquo; feel to the form, but it&rsquo;s not part of the handler. Be sure to set up your form to send data via post:</p>
+	<div class="grayCell code">
+		&lt;<span class="dkBlue">form</span> <span class="ltBlue">role=</span><span class="red">&quot;form&quot;</span> <span class="ltBlue">method=</span><span class="red">&quot;post&quot;</span> <span class="ltBlue">name=</span><span class="red">&quot;form&quot;</span>&gt;
+	</div>
+	<p>Also make sure you use IDs for your form fields.</p>
+	<p>When you are ready with your form, then you&rsquo;ll need to configure the <em>jqueryWebForm.js</em> file to fit your form. Look at lines 12-16. These lines pull the data from your form fields (you can see why you need to make sure you have IDs on those fields) and creates a datastring that will be fed into whatever you use to process said data.</p>
+	<div class="grayCell code">
+		var <span class="red">cForm01</span> = K(<span class="ltBlue">&quot;#cForm01&quot;</span>).val();<br>
+		var <span class="red">cForm02</span> = K(<span class="ltBlue">&quot;#cForm02&quot;</span>).val();<br>
+		var <span class="red">cForm03</span> = K(<span class="ltBlue">&quot;#cForm03&quot;</span>).val();<br>
+		var <span class="red">cForm04</span> = K(<span class="ltBlue">&quot;#cForm04&quot;</span>).val();<br>
+		var <span class="red">dataString</span> = <span class="ltBlue">&apos;cForm01=&apos;</span>+ cForm01 + <span class="ltBlue">&apos;&cForm02=&apos;</span> + cForm02 + <span class="ltBlue">&apos;&cForm03=&apos;</span> + cForm03 + <span class="ltBlue">&apos;&cForm04=&apos;</span> + cForm04;
+	</div>
+	<p>The first four lines are for the individual form fields.  You&rsquo;ll need one for each form field you are collecting data from, so if your form has seven fields then you need seven lines there. You can name the variables anything you like, and you tie them to the IDs from your form fields.</p>
+	<p>The fifth line is the data string that will be sent via post to the PHP Handler that will process your data. We&rsquo;ll get into that PHP Handler later, but as you can see, every variable you use is made into a string that is remiscent of a querystring, but obviously won&rsquo;t be visible.</p>
+	<p>After you set up your data string, you&rsquo;ll also need to edit line 18, as it pertains to which fields you want as "required":</p>
+	<div class="grayCell code">
+		if(<span class="red">cForm01</span>==&apos;&apos; || <span class="red">cForm02</span>==&apos;&apos; || <span class="red">cForm03</span>==&apos;&apos; || <span class="red">cForm04</span>==&apos;&apos;) {
+	</div>
+	<p>This is currently set up make all the fields required, but you can add or remove any of those fields as you see fit. I kept this simple for example reasons, but you could modify this further with several if statements or a switch to call out specfic fields that need to be filled.</p>
+	<p>From there, the script is set up to show the error messaage if the if statement isn&rsquo;t satisfied, or to send the data to the PHP Handler we will have in place to process said data. The URL on line 25 is our php page that will process the data, and the success function shows the "success" message to the end user.</p>
+	<h2>The PHP Handler</h2>
+	<p>The file <em>formHandler.php</em> is where the data goes to be sent out via email. You can also set up this file to connect to a database and place the data in if you know how, but we&rsquo;re sticking to email for this exercise.</p>
+	<p>Setting this file up for your needs isn&rsquo;t difficult. Lines 5-8 are where your data is collected from the data string sent from <em>jqueryWebForm.js</em>.</p>
+	<div class="grayCell code">
+		<span class="dkBlue">$userName</span> = $_POST[<span class="green">&quot;cForm01&quot;</span>];<br>
+		<span class="dkBlue">$yourEmail</span> = $_POST[<span class="green">&quot;cForm02&quot;</span>];<br>
+		<span class="dkBlue">$sendTo</span> = $_POST[<span class="green">&quot;cForm03&quot;</span>];<br>
+		<span class="dkBlue">$comment</span> = $_POST[<span class="green">&quot;cForm04&quot;</span>];
+	</div>
+	<p>You will need to set up one of these lines for each piece of data you have coming in. The variables are up to you as you see fit. There are also corresponding lines that will strip any and all html tags out of the data that comes on. Totally optional, but ideal for security reasons.</p>
+	<div class="grayCell code">
+		<span class="dkBlue">$userName</span> = <span class="green">strip_tags</span>(<span class="ltBlue">$userName</span>);<br>
+		<span class="dkBlue">$email</span> = <span class="green">strip_tags</span>(<span class="ltBlue">$email</span>);<br>
+		<span class="dkBlue">$sendTo</span> = <span class="green">strip_tags</span>(<span class="ltBlue">$sendTo</span>);<br>
+		<span class="dkBlue">$comment</span> = <span class="green">strip_tags</span>(<span class="ltBlue">$comment</span>);
+	</div>
+	<p>The next part is what sets up the polished data to be emailed.</p>
+	<div class="grayCell code">
+		<span class="dkBlue">$To</span> = &quot;<span class="ltBlue">$sendTo</span>&quot;;<br>
+		<span class="dkBlue">$Subject</span> = &quot;<span class="red">Email form submission.</span>&quot;;<br>
+		<span class="dkBlue">$Message</span> = &quot;<span class="ltBlue">$comment\r\n&quot;;<br></span>
+		<span class="dkBlue">$Extra</span> = &quot;<span class="red">From:</span> <span class="ltBlue">$userName</span> &lt;<span class="ltBlue">$email</span>&gt;\r\n&quot;;
+	</div>
+	<p>If you wish to have a dedicated email this data is sent to, then you can remove the $sendTo variable and simply put in an email address.  If you&rsquo;re having several form fields you wish to send in the message area, you can set it up as a string with the carriage return and new line syntax (/r/n) in between them. Here&rsquo;s an example:</p>
+	<div class="grayCell code">
+		<span class="dkBlue">$Message</span> = &quot;<span class="ltBlue">$firstName $lastName</span>\r\n<span class="ltBlue">$address1</span>\r\n<span class="ltBlue">$address2</span>\r\n<span class="ltBlue">$city</span>, <span class="ltBlue">$state $zipCode</span>\r\n&quot;;
+	</div>
+	<p>This would obviously send a full name and address, if you had set up the form to do that.</p>
+	<p>If you have it all set, then you should be good to go from there. Just link <em>jqueryWebForm.js</em> on your web form and let it fly.</p>
+	<h2>What about form security?</h2>
+	<p>I&rsquo;m sure any experienced web developer would look at this form and ask about security. I will admit I did not put any security measures here because I didn&rsquo;t want to give away to the public how I secure my forms. I will say though that securing forms is important and not to overlook it, unless you like loads of spam from bots.</p>
+	<h2>Questions? Comments? Suggestions?</h2>
+	<p class="addMarginBtm3">Please feel free to <a href="https://amportfolio.com/contact">reach out</a>!</p>
+	<p class="copyright textCenter">&copy; 2014 | All rights reserved</p>
+
+</div>
+
+	<!-- Javascript -->
+	<!-- ================================================== -->
+	<!-- Placed at the end of the document so the pages load faster -->
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+	<script src="js/formAnimation.js"></script>
+	<script src="js/jqueryWebForm.js"></script>
+
+</body>
+</html>
